@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O que vais fazer hoje?</title>
+    <title>Explosão e Contagem</title>
     <style>
         body {
             background-color: #4a4a4a; /* Um tom mais escuro de cinza */
@@ -71,14 +71,6 @@
             border: none;
         }
 
-        .random-message {
-            margin-top: 20px;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: center;
-        }
-
         .message {
             margin-top: 20px;
             font-size: 1.2rem;
@@ -86,12 +78,40 @@
             text-align: center;
         }
 
-        #message-container {
+        #timer {
+            font-size: 1.5rem;
+            color: red;
             margin-top: 20px;
-            text-align: center;
+        }
+
+        /* Animação de explosão */
+        @keyframes explosion {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(30); /* Aumenta a escala para cobrir o ecrã */
+                opacity: 0;
+            }
+        }
+
+        .explosion {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, red, black);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: explosion 1.5s ease-out forwards; /* Explosão mais longa e maior */
+            z-index: 10;
         }
     </style>
     <script>
+        let countdown;
+
         function simClick() {
             // Exibir um formulário com 3 perguntas
             document.body.innerHTML = `
@@ -110,9 +130,8 @@
                         <button type="submit">Enviar</button>
                     </form>
                 </div>
-                <div id="message-container">
-                    <p id="finalMessage" class="message"></p> <!-- Div para a mensagem final -->
-                </div>
+                <p id="finalMessage" class="message"></p> <!-- Div para a mensagem final -->
+                <p id="timer" style="display: none;">Auto destruicao em 10 ...</p>
             `;
             document.body.style.display = "flex";
             document.body.style.justifyContent = "center";
@@ -126,7 +145,34 @@
             // Exibir a mensagem abaixo do contêiner após o envio
             var finalMessage = document.getElementById("finalMessage");
             finalMessage.innerHTML = "Envia print das respostas ao Fabio!";
-            return false; // Impedir envio do formulário e manter a mensagem
+            
+            // Mostrar o timer
+            document.getElementById("timer").style.display = "block";
+            
+            let timeLeft = 10;
+            countdown = setInterval(function() {
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    explode();
+                } else {
+                    document.getElementById("timer").innerHTML = `Auto destruicao em ${timeLeft} ...`;
+                }
+                timeLeft -= 1;
+            }, 1000);
+
+            return false; // Impedir envio do formulário
+        }
+
+        function explode() {
+            // Criar uma explosão na tela
+            let explosionDiv = document.createElement('div');
+            explosionDiv.className = 'explosion';
+            document.body.appendChild(explosionDiv);
+            
+            // Após a explosão, exibir a mensagem final
+            setTimeout(function() {
+                document.body.innerHTML = `<h1 style="color: red; text-align: center; font-size: 3rem;">💥 Espero que tenhas conseguido tirar print, senao vou ter de raptar a Estrela!</h1>`;
+            }, 1500); // Sincronizar com o tempo da animação de explosão (1.5s)
         }
 
         function naoHover() {
